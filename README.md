@@ -1,2 +1,3 @@
-# homelab
+# Homelab
+
 Homelab As Code

@@ -29,8 +29,8 @@ locals {
     "1.14" = "kindest/node:v1.14.10@sha256:f8a66ef82822ab4f7569e91a5bccaf27bceee135c1457c512e54de8c6f7219f8"
   }
   cluster_name = yamldecode(data.local_file.kind_config.content).name
-  cluster_exists = "cluster_exists=$(kind get clusters | grep '${local.cluster_name}')"
   install_script = join("/", [path.module, "scripts", "install.sh"])
+  cluster_script = join("/", [path.module, "scripts", "cluster.sh"])
 }
 
 resource "null_resource" "install_docker" {
@@ -54,6 +54,9 @@ resource "null_resource" "install_kind" {
   provisioner "local-exec" {
     command = "sudo ${local.install_script} install kind"
     interpreter = ["bash", "-c"]
+    environment = {
+      KIND_VERSION = var.kind_version
+    }
   }
 
   depends_on = [null_resource.install_docker]
@@ -66,7 +69,11 @@ resource "null_resource" "create_cluster" {
   }
 
   provisioner "local-exec" {
-    command = var.delete_cluster ? "kind delete cluster --name ${local.cluster_name}" : "${local.cluster_exists}; [[ $cluster_exists == ${local.cluster_name} ]] || kind create cluster --config=${data.local_file.kind_config.filename}"
+    command = "chmod +x ${local.cluster_script}"
+  }
+
+  provisioner "local-exec" {
+    command = var.delete_cluster ? "${local.cluster_script} delete ${local.cluster_name}" : "${local.cluster_script} create ${local.cluster_name} ${data.local_file.kind_config.filename}"
     interpreter = ["bash", "-c"]
   }
 

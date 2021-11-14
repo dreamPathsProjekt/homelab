@@ -33,7 +33,6 @@ locals {
     "1.14" = "kindest/node:v1.14.10@sha256:f8a66ef82822ab4f7569e91a5bccaf27bceee135c1457c512e54de8c6f7219f8"
   }
   cluster_name = yamldecode(data.local_file.kind_config.content).name
-  cluster_exists = "cluster_exists=$(kind get clusters | grep '${local.cluster_name}')"
 }
 
 resource "null_resource" "install_docker" {
@@ -79,7 +78,7 @@ resource "null_resource" "install_kind" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo su - root -c '/tmp/install.sh install kind'"
+      "sudo su - root -c 'KIND_VERSION=${var.kind_version} /tmp/install.sh install kind'"
     ]
   }
 
@@ -103,13 +102,22 @@ resource "null_resource" "create_cluster" {
   }
 
   provisioner "file" {
+    source = join("/", [path.module, "scripts", "install.sh"])
+    destination = "/tmp/cluster.sh"
+  }
+
+  provisioner "file" {
     content = data.local_file.kind_config.content
     destination = "/tmp/config.yaml"
   }
 
   provisioner "remote-exec" {
+    inline = ["chmod +x /tmp/cluster.sh"]
+  }
+
+  provisioner "remote-exec" {
     inline = [
-      var.delete_cluster ? "kind delete cluster --name ${local.cluster_name}" : "${local.cluster_exists}; [ $cluster_exists = ${local.cluster_name} ] || kind create cluster --config=/tmp/config.yaml"
+      var.delete_cluster ? "/tmp/cluster.sh delete ${local.cluster_name}" : "/tmp/cluster.sh create ${local.cluster_name} /tmp/config.yaml"
     ]
   }
 

@@ -26,7 +26,7 @@ resource "null_resource" "compose_dependencies" {
 }
 
 module "kind_provision" {
-  source = "../../modules/kind_local"
+  source = "github.com/dreamPathsProjekt/homelab.git//terraform/modules/kind_local?ref=kind_local-v0.8.0"
 
   kind_config_file = join("/", [path.root, "config", "config.yaml"])
 

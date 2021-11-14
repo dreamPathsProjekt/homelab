@@ -63,6 +63,7 @@ resource "null_resource" "install_kind" {
 }
 
 resource "null_resource" "create_cluster" {
+  count = var.create_cluster || var.delete_cluster ? 1 : 0
   triggers = {
     create = var.create_cluster
     delete = var.delete_cluster

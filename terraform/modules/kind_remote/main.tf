@@ -102,12 +102,12 @@ resource "null_resource" "create_cluster" {
   }
 
   provisioner "file" {
-    source = join("/", [path.module, "scripts", "install.sh"])
+    source = join("/", [path.module, "scripts", "cluster.sh"])
     destination = "/tmp/cluster.sh"
   }
 
   provisioner "file" {
-    content = data.local_file.kind_config.content
+    source = data.local_file.kind_config.filename
     destination = "/tmp/config.yaml"
   }
 

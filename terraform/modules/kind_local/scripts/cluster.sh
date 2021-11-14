@@ -26,7 +26,7 @@ delete() {
     if _cluster_exists "$_cluster_name"; then
         kind delete cluster --name="$_cluster_name"
     else
-        echo "Cluster $_cluster_name exists. Skip delete cluster."
+        echo "Cluster $_cluster_name doesn't exist. Skip delete cluster."
     fi
 }
 

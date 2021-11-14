@@ -14,4 +14,4 @@ A short list of what to expect:
 - A shitload of __CRDs & operators__ for no reason at all.
 - A lot of beta or unmaintained __Terraform providers.__
 - It can be __overhelming__ at times.
-- __Terraform Modules__ are even versioned with tags!
+- __Terraform Modules__ are even versioned with tags. But wait, there's more! [Multiple modules](terraform/modules/) in a single repo, makes it impossible to check for newer versions with [terraform-module-versions](https://github.com/keilerkonzept/terraform-module-versions)
